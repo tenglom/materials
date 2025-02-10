@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Construction Materials Quiz</title>
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            transition: all 0.3s ease;
+        }
+
+        article {
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            flex: 1;
+        }
+
+        .quiz-section {
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            flex: 1;
+            display: none;
+        }
+
+        .quiz-section.active {
+            display: block;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        #score-display {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #2c3e50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        #timer-display {
+            position: fixed;
+            top: 60px;
+            right: 20px;
+            background-color: #34495e;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+        }
+
+        #toggleButton {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .question {
+            display: none;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .question.active {
+            display: block;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option {
+            padding: 10px 15px;
+            background-color: white;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover:not(.disabled) {
+            background-color: #e9ecef;
+        }
+
+        .option.correct {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        .option.incorrect {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .option.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <button id="toggleButton">Toggle Quiz</button>
+    <div id="score-display">Score: 0</div>
+    <div id="timer-display">Time: 8s</div>
+
+    <div class="container">
+        <!-- Previous article content remains the same -->
+        <article>
+            <h1>Construction Materials Through History</h1>
+            
+            <p>The major construction materials of earlier times were wood and masonry: brick, stone, clay, tile, and similar materials. A tile is a flat square piece of baked clay or other material used for covering floors or baths. As a thin curved piece of baked clay, it is used for covering roofs. Bricks or stones were held together with a mixture of cement or lime, sand, and water called mortar.</p>
+
+            <p>The Greeks and Romans sometimes used iron rods to strengthen their buildings. The columns of the Parthenon in Athens, for example, have holes drilled in them for iron bars that have now rusted away. The Romans developed an excellent waterproof cement called pozzolana, made by mixing water, lime, and sand with a fine powder ground from volcanic rock found near Pozzuoli (hence the name).</p>
+
+            <p><strong>Cement</strong> is a material that binds together the mixture. It reacts with water, becoming cementitious, and is termed hydrated cement in this state. In contrast to traditional lime mortar, cement does not need contact with the air in order to harden off. Cement is therefore a hydraulic binder.</p>
+
+            <p><strong>Concrete</strong> is really an "artificial stone." Consisting of a dense medium of cement, water, and aggregates such as sand or gravel, it is poured into shuttering or formwork and is compacted by agitating and pressing down. Fresh concrete sets and becomes hardened concrete. The commonest concrete in use today is Portland cement concrete. It was invented in 1824 by a bricklayer called Joseph Aspdin.</p>
+
+            <p>Portland cement is a mixture of limestone and clay, which is heated and then ground into a powder. It is mixed at or near the construction site with sand, aggregate (small stones, crushed rock, or gravel), and water to make concrete. Different proportions of the ingredients produce concrete with different strength and weight. Concrete is very versatile; it can be poured, pumped, or even sprayed into all kinds of shapes. Whereas steel has great tensile strength, concrete has great strength under compression. Thus, the two substances complement each other. They also complement each other in another way: they have almost the same rate of contraction and expansion. They therefore can work together in situations where both compression and tension are factors. Steel rods are embedded in concrete to make reinforced concrete in concrete beams or structures where tension will develop. Concrete with steel reinforcement is a versatile material widely used in the load-bearing structure of buildings. Still another advantage is that steel does not rust in concrete. Acid corrodes steel, whereas concrete has an alkaline chemical reaction, the opposite of acid.</p>
+
+            <p>Steel, as a very tough and strong metal, has many useful applications in a wide range of constructions. The best building materials are strong, durable, and easily obtainable. Steel, an alloy of iron and carbon, is the most commonly used alloy in industry.</p>
+        </article>
+
+
+        <div class="quiz-section">
+            <h1>Test Your Comprehension</h1>
+            <div id="quiz"></div>
+        </div>
+    </div>
+
+    <script>
+        // Prevent page refresh
+        window.addEventListener('beforeunload', function (e) {
+            e.preventDefault();
+            e.returnValue = '';
+        });
+
+        const questions = [
+            {
+                question: "What was the waterproof cement developed by Romans called?",
+                options: ["Portland cement", "Pozzolana", "Hydrated cement", "Lime mortar"],
+                correct: 1
+            },
+            {
+                question: "Who invented Portland cement concrete in 1824?",
+                options: ["The Romans", "The Greeks", "Joseph Aspdin", "Ancient Egyptians"],
+                correct: 2
+            },
+            {
+                question: "Which of these is NOT a characteristic of concrete?",
+                options: ["Great tensile strength", "Can be poured", "Can be pumped", "Can be sprayed"],
+                correct: 0
+            },
+            {
+                question: "Why doesn't steel rust in concrete?",
+                options: [
+                    "Because concrete prevents water from reaching the steel",
+                    "Because concrete has an alkaline chemical reaction",
+                    "Because steel is coated before being used",
+                    "Because concrete contains special anti-rust additives"
+                ],
+                correct: 1
+            }
+        ];
+
+        class Quiz {
+            constructor(questions) {
+                this.questions = this.shuffleQuestions(questions);
+                this.currentQuestionIndex = 0;
+                this.score = 0;
+                this.timer = null;
+                this.timeLeft = 8;
+
+                this.scoreDisplay = document.getElementById('score-display');
+                this.timerDisplay = document.getElementById('timer-display');
+                this.quizContainer = document.getElementById('quiz');
+            }
+
+            shuffleQuestions(array) {
+                return array.sort(() => Math.random() - 0.5);
+            }
+
+            createQuiz() {
+                this.quizContainer.innerHTML = '';
+                this.questions.forEach((q, qIndex) => {
+                    const questionDiv = document.createElement('div');
+                    questionDiv.className = 'question';
+                    questionDiv.dataset.index = qIndex;
+                    
+                    questionDiv.innerHTML = `
+                        <p><strong>Question ${qIndex + 1}:</strong> ${q.question}</p>
+                        <div class="options">
+                            ${q.options.map((opt, i) => `
+                                <div class="option" data-question="${qIndex}" data-option="${i}">
+                                    ${opt}
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    
+                    this.quizContainer.appendChild(questionDiv);
+                });
+
+                this.startQuiz();
+            }
+
+            startQuiz() {
+                // Hide all questions
+                document.querySelectorAll('.question').forEach(q => q.classList.remove('active'));
+                
+                // Show first question
+                this.showNextQuestion();
+            }
+
+            showNextQuestion() {
+                // Clear previous timer
+                if (this.timer) {
+                    clearInterval(this.timer);
+                }
+
+                // Reset timer
+                this.timeLeft = 8;
+                this.updateTimerDisplay();
+
+                // Hide all questions
+                document.querySelectorAll('.question').forEach(q => q.classList.remove('active'));
+
+                // If no more questions, end quiz
+                if (this.currentQuestionIndex >= this.questions.length) {
+                    this.endQuiz();
+                    return;
+                }
+
+                // Show current question
+                const currentQuestion = document.querySelector(`.question[data-index="${this.currentQuestionIndex}"]`);
+                if (currentQuestion) {
+                    currentQuestion.classList.add('active');
+                    this.setupQuestionListeners(currentQuestion);
+                    this.startTimer();
+                }
+            }
+
+            setupQuestionListeners(questionElement) {
+                const options = questionElement.querySelectorAll('.option');
+                
+                options.forEach(option => {
+                    option.classList.remove('correct', 'incorrect', 'disabled');
+                    
+                    option.addEventListener('click', (e) => {
+                        // Prevent multiple clicks
+                        if (option.classList.contains('disabled')) return;
+
+                        const questionIndex = parseInt(option.dataset.question);
+                        const optionIndex = parseInt(option.dataset.option);
+                        
+                        // Clear timer
+                        clearInterval(this.timer);
+
+                        // Check if answer is correct
+                        if (optionIndex === this.questions[questionIndex].correct) {
+                            // Correct answer
+                            option.classList.add('correct');
+                            this.updateScore(1);
+                            
+                            // Move to next question after a short delay
+                            setTimeout(() => {
+                                this.currentQuestionIndex++;
+                                this.showNextQuestion();
+                            }, 1000);
+                        } else {
+                            // Incorrect answer
+                            option.classList.add('incorrect', 'disabled');
+                            this.updateScore(-0.5);
+                        }
+                    });
+                });
+            }
+
+            startTimer() {
+                this.timer = setInterval(() => {
+                    this.timeLeft--;
+                    this.updateTimerDisplay();
+
+                    if (this.timeLeft <= 0) {
+                        // Time ran out
+                        clearInterval(this.timer);
+                        this.currentQuestionIndex++;
+                        this.resetScore();
+                        this.showNextQuestion();
+                    }
+                }, 1000);
+            }
+
+            updateTimerDisplay() {
+                this.timerDisplay.textContent = `Time: ${this.timeLeft}s`;
+            }
+
+            updateScore(points) {
+                this.score = Math.max(0, this.score + points);
+                this.scoreDisplay.textContent = `Score: ${this.score.toFixed(1)}`;
+            }
+
+            resetScore() {
+                this.score = 0;
+                this.scoreDisplay.textContent = `Score: 0`;
+            }
+
+            endQuiz() {
+                this.quizContainer.innerHTML = `
+                    <div style="text-align: center; padding: 20px;">
+                        <h2>Quiz Completed!</h2>
+                        <p>Your final score: ${this.score.toFixed(1)}</p>
+                    </div>
+                `;
+                clearInterval(this.timer);
+            }
+        }
+
+        // Quiz toggle functionality
+        const toggleButton = document.getElementById('toggleButton');
+        const quizSection = document.querySelector('.quiz-section');
+        let quiz = null;
+
+        toggleButton.addEventListener('click', function() {
+            quizSection.classList.toggle('active');
+            
+            if (quizSection.classList.contains('active')) {
+                // Initialize quiz when shown
+                quiz = new Quiz(questions);
+                quiz.createQuiz();
+                this.textContent = 'Hide Quiz';
+            } else {
+                // Reset quiz when hidden
+                this.textContent = 'Show Quiz';
+                if (quiz) {
+                    clearInterval(quiz.timer);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
